@@ -1,15 +1,15 @@
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, Check, Shield, Users, Zap } from 'lucide-react';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 import { Button, Input } from '../../components/ui';
 import { useForm, usePasswordToggle } from '../../hooks';
+import { useSignup } from '../../hooks/queries/useAuth';
 import { getPasswordRequirements } from '../../utils';
 import { ROUTES } from '../../constants';
 import type { SignupFormData } from '../../types';
 
 export function Signup() {
-  const navigate = useNavigate();
   const { showPassword, togglePassword, inputType } = usePasswordToggle();
   const { values: form, updateValue } = useForm<SignupFormData>({
     name: '',
@@ -17,6 +17,8 @@ export function Signup() {
     password: '',
     confirmPassword: '',
   });
+
+  const { mutate: signup, isPending } = useSignup();
 
   const passwordRequirements = getPasswordRequirements(
     form.password,
@@ -26,10 +28,8 @@ export function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    navigate(ROUTES.ONBOARDING);
+    // Call the actual signup API
+    signup(form);
   };
 
   // Calculate progress for Zeigarnik effect (encourages completion)
@@ -219,7 +219,8 @@ export function Signup() {
             type="submit"
             fullWidth
             size="lg"
-            disabled={!passwordRequirements.every(r => r.met)}
+            disabled={!passwordRequirements.every(r => r.met) || isPending}
+            loading={isPending}
           >
             Create Account
           </Button>

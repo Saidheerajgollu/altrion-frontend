@@ -66,16 +66,23 @@ export const authService = {
    */
   async login(credentials: LoginFormData): Promise<AuthResponse> {
     try {
+      console.log('[Auth Service] Attempting login to:', import.meta.env.VITE_API_URL || '/api');
       const { data } = await api.post<BackendAuthResponse>('/auth/signin', {
         email: credentials.email,
         password: credentials.password,
       });
+      console.log('[Auth Service] Login successful');
       return transformAuthResponse(data);
     } catch (error) {
+      console.error('[Auth Service] Login error:', error);
       if (error instanceof ApiError) {
-        const errorData = error.data as { message?: string };
+        const errorData = error.data as { message?: string; success?: boolean };
         const message = errorData?.message || 'Invalid credentials';
-        throw new ApiError(error.status, message);
+        throw new ApiError(error.status, message, errorData);
+      }
+      // Handle network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Cannot connect to server. Please check your internet connection and try again.');
       }
       throw error;
     }
@@ -86,17 +93,24 @@ export const authService = {
    */
   async signup(data: SignupFormData): Promise<AuthResponse> {
     try {
+      console.log('[Auth Service] Attempting signup to:', import.meta.env.VITE_API_URL || '/api');
       const { data: response } = await api.post<BackendAuthResponse>('/auth/signup', {
         email: data.email,
         password: data.password,
         name: data.name,
       });
+      console.log('[Auth Service] Signup successful');
       return transformAuthResponse(response);
     } catch (error) {
+      console.error('[Auth Service] Signup error:', error);
       if (error instanceof ApiError) {
-        const errorData = error.data as { message?: string };
+        const errorData = error.data as { message?: string; success?: boolean };
         const message = errorData?.message || 'Registration failed';
-        throw new ApiError(error.status, message);
+        throw new ApiError(error.status, message, errorData);
+      }
+      // Handle network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Cannot connect to server. Please check your internet connection and try again.');
       }
       throw error;
     }
