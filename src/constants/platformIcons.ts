@@ -14,6 +14,7 @@ export const PLATFORM_ICONS: Record<string, PlatformIcon> = {
   phantom: { logo: '/phantom.jpg', color: 'bg-purple-500/20' },
   ledger: { logo: '/ledger.png', color: 'bg-slate-500/20' },
   trustwallet: { logo: '/trustwallet.webp', color: 'bg-cyan-500/20' },
+  wallet: { logo: '/wallet.svg', color: 'bg-emerald-500/20' },
 
   // Banks
   chase: { icon: DollarSign, color: 'bg-blue-600/20 text-blue-500' },

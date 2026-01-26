@@ -41,6 +41,7 @@ interface PublicOnlyRouteProps {
  * Public-only Route wrapper that redirects to dashboard if user is already authenticated
  * Useful for login/signup pages
  */
+<<<<<<< Updated upstream
 export function PublicOnlyRoute({
   children,
   redirectTo = ROUTES.DASHBOARD,
@@ -67,6 +68,21 @@ export function PublicOnlyRoute({
 
     return <Navigate to={from || redirectTo} replace />;
   }
+=======
+export function PublicOnlyRoute({
+  children,
+  redirectTo = ROUTES.DASHBOARD,
+}: PublicOnlyRouteProps) {
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const location = useLocation();
+
+  if (isAuthenticated) {
+    // Check if there's a return URL in state
+    const from = (location.state as { from?: string })?.from;
+
+    return <Navigate to={from || redirectTo} replace />;
+  }
+>>>>>>> Stashed changes
 
   return <>{children}</>;
 }

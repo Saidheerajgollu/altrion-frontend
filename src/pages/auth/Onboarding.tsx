@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button, Card, Logo } from '../../components/ui';
+import { authService } from '../../services';
+import { useAuthStore } from '../../store';
 
 
 
@@ -15,6 +17,7 @@ const steps = [
 ];
 
 export function Onboarding() {
+<<<<<<< Updated upstream
   const navigate = useNavigate();
   const [form, setForm] = useState({
     displayName: '',
@@ -23,6 +26,38 @@ export function Onboarding() {
   const handleNext = () => {
     navigate('/connect/select');
   };
+=======
+  const navigate = useNavigate();
+  const { setUser, completeOnboarding } = useAuthStore();
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [form, setForm] = useState({
+    displayName: '',
+  });
+
+  const handleNext = async () => {
+    const nickname = form.displayName.trim();
+    if (!nickname) return;
+
+    try {
+      const updatedUser = await authService.updateNickname(nickname);
+      setUser({
+        ...updatedUser,
+        displayName: updatedUser.displayName || nickname,
+      });
+      localStorage.setItem('altrion-displayName', nickname);
+      completeOnboarding();
+    } catch (error) {
+      console.error('Failed to update nickname', error);
+      return;
+    }
+
+    // Peak-end rule: Trigger celebration before final navigation
+    setShowCelebration(true);
+    setTimeout(() => {
+      navigate('/connect/select');
+    }, 3000); // Show celebration for 3 seconds
+  };
+>>>>>>> Stashed changes
 
   const canProceed = () => {
     return form.displayName.length >= 2;
@@ -92,7 +127,7 @@ export function Onboarding() {
           <div className="flex justify-end mt-8">
             <Button
               onClick={handleNext}
-              disabled={!canProceed()}
+              disabled={!canProceed() || showCelebration}
             >
               Continue
               <ArrowRight size={18} />
